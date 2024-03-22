@@ -32,4 +32,18 @@ contract SimpleStore {
         favoriteNumbersOf[personNumber] = personName;
         emit AddPerson(personNumber, personName);
     }
+
+        function registerCandidate(uint _id, string memory _name) public onlyOwner {
+        require(candidates[_id].id == 0, "Candidate with this ID already exists");        
+        Candidate memory newCandidate = Candidate(_id, _name, 0);
+        candidates[_id] = newCandidate;
+        candidateIds.push(_id);
+    }
+
+        function vote(uint _candidateId) public {
+        require(candidates[_candidateId].id != 0, "Candidate with this ID does not exist");
+        require(!voters[msg.sender], "You have already voted");        
+        candidates[_candidateId].voteCount++;
+        voters[msg.sender] = true;
+    }
 }
