@@ -1,49 +1,30 @@
-
-
-pragma solidity ^0.8.18;
-
-contract SimpleStore {
-    uint256 public favoriteNumber;
-
-    uint256[] listOfFavoriteNumbers;
-
-    Person[] public listOfPersons;
-    
-    mapping (uint256 favoriteNumber => string ofPerson) public favoriteNumbersOf;
-    
-    struct Person {
-        uint256 preferredNumber;
+pragma solidity ^0.8.0;
+ 
+contract VotingSystem {
+    struct Candidate {
+        uint id; 
         string name;
+        uint voteCount; 
     }
+    mapping(uint => Candidate) public candidates;
+    uint[] public candidateIds;
+    mapping(address => bool) public voters;
+    address public owner;
+    constructor() {
+        owner = msg.sender; 
+    }
+ 
 
-    event AddPerson(uint favoriteNumber, string personName);
-    
-    function store(uint256 fNumber) public {
-        favoriteNumber = fNumber;
-        favoriteNumber++;
+    function addCandidate(uint _id, string memory _name) public {
+        require(msg.sender == owner, "Only owner can add candidates"); 
+        candidates[_id] = Candidate(_id, _name, 0); 
+        candidateIds.push(_id); 
     }
-        
-    function retrievefavoritenumber() public view returns(uint256){
-            return favoriteNumber;
-    }
-
-    function addPerson(uint256 personNumber, string memory personName) public {
-        listOfPersons.push(Person(personNumber, personName));
-        favoriteNumbersOf[personNumber] = personName;
-        emit AddPerson(personNumber, personName);
-    }
-
-        function registerCandidate(uint _id, string memory _name) public onlyOwner {
-        require(candidates[_id].id == 0, "Candidate with this ID already exists");        
-        Candidate memory newCandidate = Candidate(_id, _name, 0);
-        candidates[_id] = newCandidate;
-        candidateIds.push(_id);
-    }
-
-        function vote(uint _candidateId) public {
-        require(candidates[_candidateId].id != 0, "Candidate with this ID does not exist");
-        require(!voters[msg.sender], "You have already voted");        
-        candidates[_candidateId].voteCount++;
-        voters[msg.sender] = true;
+ 
+    function vote(uint _candidateId) public {
+        require(!voters[msg.sender], "You have already voted"); 
+        require(candidates[_candidateId].id != 0, "Candidate does not exist"); 
+        candidates[_candidateId].voteCount++; 
+        voters[msg.sender] = true; 
     }
 }
